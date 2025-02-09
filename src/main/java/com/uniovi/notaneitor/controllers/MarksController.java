@@ -64,7 +64,7 @@ public class MarksController {
         return "mark/edit";
     }
 
-    //Metodo que responde a la PETICION POST enviada por el formulario de edit.html de la Mark en cuestion
+    //Metodo que responde a la PETICION POST enviada por el formulario de delete.html de la Mark en cuestion
     @RequestMapping(value="/mark/edit/{id}", method=RequestMethod.POST)
     public String setEdit(@ModelAttribute Mark mark, @PathVariable Long id){
         mark.setId(id);

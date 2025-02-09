@@ -3,10 +3,12 @@ package com.uniovi.notaneitor.controllers;
 import com.uniovi.notaneitor.entities.Teacher;
 import com.uniovi.notaneitor.services.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+//@RestController
+@Controller //para usar Model y las Vistas, cambio a este
 public class TeacherController {
 
     @Autowired  //Inyectar el servicio (el cual crea Bean)
@@ -14,58 +16,52 @@ public class TeacherController {
 
     //Metodo por cada URL a la que responde el controlador
     @RequestMapping("/teacher/list")
-    public String getList() {
+    public String getList(Model model) { //IMP Modelo-Vista: Meto Model para pasar datos a la vista
         //return "Getting List";
-        return teacherService.getTeachers().toString();
+        //return teacherService.getTeachers().toString();
+        model.addAttribute("teacherList", teacherService.getTeachers()); //esto lo recibe y lo itera la vista de list
+        return "professor/list";
     }
 
-    /*
-    @RequestMapping(value = "/teacher/add", method = RequestMethod.POST) //Especificamos que use POST
+
+    @RequestMapping(value = "/teacher/add", method = RequestMethod.POST)
     public String setTeacher(@ModelAttribute Teacher teacher) {
         teacherService.addTeacher(teacher);
+        /*
         return "added: Teacher with dni: " + teacher.getDni()
                 + " with name : " + teacher.getName()
                 + " surname: " + teacher.getSurname()
                 + " category: " + teacher.getCategory();
+         */
+        return "redirect:/teacher/list";  //al anadir pasa a LA PETICION de la lista
     }
-     */
 
+    //Solo para ir a la Vista de add (POR ENDE, AL PEDIR Y NO ENVIAR NADA, ES GET)
     @RequestMapping(value = "/teacher/add")
-    public String setTeacher(@ModelAttribute Teacher teacher) {
-        teacherService.addTeacher(teacher);
-        return "added: Teacher with dni: " + teacher.getDni()
-                + " with name : " + teacher.getName()
-                + " surname: " + teacher.getSurname()
-                + " category: " + teacher.getCategory();
+    public String setTeacher() {
+        return "professor/add";
     }
 
     //ESTE CON DNI
     @RequestMapping("/teacher/details/{dni}")
-    public String getDetail(@PathVariable String dni) {
-        return teacherService.getTeacher(dni).toString();
+    public String getDetail(Model model, @PathVariable String dni) { //IMP Modelo-Vista: Meto Model para pasar datos a la vista
+        //return teacherService.getTeacher(dni).toString();
+        model.addAttribute("teacher", teacherService.getTeacher(dni)); //esto lo recibe y lo itera la vista de details
+        return "professor/details";
     }
 
     @RequestMapping("/teacher/delete/{id}")
-    public String deleteTeacher(@PathVariable Long id) {
+    public String deleteTeacher(@PathVariable Long id) { //No POST pues va a ser un boton que al darle ya se registre el ID del que borrar, por lo que no hay que enviar nada POST
         teacherService.deleteTeacher(id);
-        return "Deleted teacher with =>" + id;
+        //return "Deleted teacher with =>" + id;
+        return "redirect:/teacher/list";  //al borrar pasa a LA PETICION de lista
     }
 
-
-    @RequestMapping(value = "/teacher/edit/{dni}")
-    public String setEditTeacher(@ModelAttribute Teacher teacher, @PathVariable String dni) {
-        Teacher existingTeacher = teacherService.getTeacher(dni);
-        if (existingTeacher != null) {
-            existingTeacher.setName(teacher.getName());
-            existingTeacher.setSurname(teacher.getSurname());
-            existingTeacher.setCategory(teacher.getCategory());
-            return "Profesor editado de dni: => " + existingTeacher.getDni();
-        } else {
-            return "No existe el profesor con dni => " + dni;
-        }
+    @RequestMapping(value = "/teacher/edit")
+    public String setEditTeacher(@ModelAttribute Teacher teacherModelAtrib) {
+        teacherService.editTeacher(teacherModelAtrib);
+        return "Profesor editado de dni: => " + teacherModelAtrib.getDni();
     }
-
-
 
 
 }
