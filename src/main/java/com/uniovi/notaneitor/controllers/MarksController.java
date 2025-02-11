@@ -23,6 +23,14 @@ public class MarksController {
         return "mark/list"; //devuelve la vista mark/list.html
     }
 
+    @RequestMapping("/mark/list/update")
+    public String updateList(Model model){
+        model.addAttribute("markList", marksService.getMarks() );
+        return "mark/list :: marksTable";  //EN LUGAR DE RETORNAR TODA LA VISTA, SOLO DEVUELVE EL FRAGMENTO marksTable (declarado en list.html)
+    }
+
+
+
     @RequestMapping(value = "/mark/add", method = RequestMethod.POST) //ESTA EN CONCRETO especificamos que use POST
     public String setMark(@ModelAttribute Mark mark) { //hacemos uso de la clase Mark de Entities
 
