@@ -1,6 +1,7 @@
 package com.uniovi.notaneitor.entities;
 
-import jakarta.persistence.*;
+//import jakarta.persistence.*; //cambio de version
+import javax.persistence.*;
 
 @Entity
 public class Mark {

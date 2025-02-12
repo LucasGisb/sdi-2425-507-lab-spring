@@ -1,5 +1,8 @@
 package com.uniovi.notaneitor.controllers;
+import com.uniovi.notaneitor.services.SecurityService;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,8 +14,12 @@ public class UsersController {
 
     private final UsersService usersService;
 
-    public UsersController(UsersService usersService) {
+    private final SecurityService securityService;
+
+    public UsersController(UsersService usersService, SecurityService securityService) {
         this.usersService = usersService;
+
+        this.securityService = securityService;
     }
 
     @RequestMapping("/user/list")
@@ -57,4 +64,29 @@ public class UsersController {
         usersService.addUser(user);
         return "redirect:/user/details/" + id;
     }
+
+
+
+    @RequestMapping(value = "/signup", method = RequestMethod.POST) //registrar un nuevo usuario
+    public String signup(@ModelAttribute("user") User user, Model model) {
+        usersService.addUser(user);
+        securityService.autoLogin(user.getDni(), user.getPasswordConfirm());
+        return "redirect:home";
+    }
+
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public String login() {
+        return "login";
+    }
+
+    @RequestMapping(value = {"/home"}, method = RequestMethod.GET)
+    public String home(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();  //Obtiene la Autentificacion del usuario actual
+        String dni = auth.getName(); //obtenemos IDENTIFICADOR (dni) del usuario autentificado
+        User activeUser = usersService.getUserByDni(dni); //sacamos el Usuario en base a lo anterior
+        model.addAttribute("markList", activeUser.getMarks()); //Sacamos la lista de notas del usuario registrado
+        return "home";
+    }
+
+
 }

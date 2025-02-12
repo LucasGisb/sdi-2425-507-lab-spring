@@ -2,7 +2,8 @@ package com.uniovi.notaneitor.services;
 
 import com.uniovi.notaneitor.entities.Mark;
 import com.uniovi.notaneitor.repositories.MarksRepository;
-import jakarta.annotation.PostConstruct;
+//import jakarta.annotation.PostConstruct; //cambio de version
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

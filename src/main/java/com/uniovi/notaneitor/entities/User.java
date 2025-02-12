@@ -1,8 +1,11 @@
 package com.uniovi.notaneitor.entities;
-import jakarta.persistence.*;
+//import jakarta.persistence.*; //cambio de version
+import javax.persistence.*;
+
 import java.util.Set; //Colección que no admite duplicados
 
 @Entity
+@Table(name = "user") //Nombre de la tabla asociada de la BD
 public class User {
 
     @Id
@@ -14,10 +17,17 @@ public class User {
     private String lastName;
     private String role;
 
+    private String password;
+
+    @Transient //propiedad que no se almacena en la tabla.
+    private String passwordConfirm;
+
     //Atributo mappedBy declarado como Relacion de uno a muchos
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL) //cascade -> si se borra un usuario, se borran sus marcas
 
     private Set<Mark> marks;
+
+
 
     public User(String dni, String name, String lastName) {
         super();
@@ -52,6 +62,20 @@ public class User {
     public void setMarks(Set<Mark> marks) {
         this.marks = marks;
     }
+
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    public String getPasswordConfirm() {
+        return passwordConfirm;
+    }
+    public void setPasswordConfirm(String passwordConfirm) {
+        this.passwordConfirm = passwordConfirm;
+    }
+
     public String getFullName() {
         return this.name + " " + this.lastName;
     }
