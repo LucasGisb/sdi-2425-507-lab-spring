@@ -37,8 +37,11 @@ public class UsersService {
     public User getUser(Long id) {
         return usersRepository.findById(id).get();
     }
+
     public void addUser(User user) {
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        if(user.getPassword() != null){
+            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        }
 
         usersRepository.save(user);
     }
@@ -49,5 +52,16 @@ public class UsersService {
     public User getUserByDni(String dni) {
         //llama al metodo implementado de la interfaz UsersRepository
         return usersRepository.findByDni(dni);
+    }
+
+
+
+    public void editUser(User user) {
+        /*
+        if(user.getPassword() != null){
+            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        }
+         */  //Al ser editar, no modifico la contrasena
+        usersRepository.save(user);
     }
 }

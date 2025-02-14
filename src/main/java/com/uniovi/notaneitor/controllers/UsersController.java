@@ -36,6 +36,13 @@ public class UsersController {
         return "user/list";
     }
 
+    //Para el boton de Actualizar de la vitsa list
+    @RequestMapping("/user/list/update")
+    public String updateList(Model model){
+        model.addAttribute("usersList", usersService.getUsers() );
+        return "user/list :: usersTable";  //EN LUGAR DE RETORNAR TODA LA VISTA, SOLO DEVUELVE EL FRAGMENTO marksTable (declarado en list.html)
+    }
+
     @RequestMapping(value = "/user/add")
     public String getUser(Model model) {
         model.addAttribute("usersList", usersService.getUsers());
@@ -44,7 +51,7 @@ public class UsersController {
 
     @RequestMapping(value = "/user/add", method = RequestMethod.POST)
     public String setUser(@ModelAttribute User user) {
-        usersService.addUser(user);
+        usersService.addUser(user); //AQUI CUIDADO TEMA DE LA CONTRASENA
         return "redirect:/user/list";
     }
 
@@ -69,7 +76,8 @@ public class UsersController {
 
     @RequestMapping(value = "/user/edit/{id}", method = RequestMethod.POST)
     public String setEdit(@PathVariable Long id, @ModelAttribute User user) {
-        usersService.addUser(user);
+        //usersService.addUser(user);
+        usersService.editUser(user); //identico a addUser, pero que no actualice su contrasena
         return "redirect:/user/details/" + id;
     }
 
@@ -106,6 +114,5 @@ public class UsersController {
         model.addAttribute("markList", activeUser.getMarks()); //Sacamos la lista de notas del usuario registrado
         return "home";
     }
-
 
 }

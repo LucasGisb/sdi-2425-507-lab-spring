@@ -17,7 +17,7 @@ public class MarksController {
 
     // Inyectamos el servicio por inyección basada en constructor
     private final MarksService marksService;
-    private final UsersService usersService;
+    private final UsersService usersService; //los dos servicios, pues ahora las Marks van relacionadas con los Users
 
     public MarksController(MarksService marksService, UsersService usersService) {
         this.marksService = marksService;
