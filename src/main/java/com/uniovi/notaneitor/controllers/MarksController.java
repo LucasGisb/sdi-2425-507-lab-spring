@@ -3,9 +3,11 @@ package com.uniovi.notaneitor.controllers;
 import com.uniovi.notaneitor.entities.Mark;
 import com.uniovi.notaneitor.services.MarksService;
 import com.uniovi.notaneitor.services.UsersService;
+import com.uniovi.notaneitor.validators.AddMarkValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 //@RestController  Para que pueda Responder con VIstas, cambiar a @Controller
@@ -19,9 +21,13 @@ public class MarksController {
     private final MarksService marksService;
     private final UsersService usersService; //los dos servicios, pues ahora las Marks van relacionadas con los Users
 
-    public MarksController(MarksService marksService, UsersService usersService) {
+    private final AddMarkValidator addMarkValidator;
+
+    public MarksController(MarksService marksService, UsersService usersService, AddMarkValidator addMarkValidator) {
         this.marksService = marksService;
         this.usersService = usersService;
+
+        this.addMarkValidator = addMarkValidator;
     }
 
     //Metodos para cada URL a la que responde el controlador:
@@ -40,17 +46,25 @@ public class MarksController {
 
 
 
-    @RequestMapping(value = "/mark/add", method = RequestMethod.POST) //ESTA EN CONCRETO especificamos que use POST
-    public String setMark(@ModelAttribute Mark mark) { //hacemos uso de la clase Mark de Entities
+    @RequestMapping(value = "/mark/add", method = RequestMethod.POST)
+    public String setMark(@ModelAttribute Mark mark, BindingResult result, Model model) { //MODEL PARA QUE, AL HABER ERRORES, PUEDA RECARGAR LA LISTA DE USUARIOS
+        addMarkValidator.validate(mark, result);
+        if (result.hasErrors()) {
+            model.addAttribute("usersList", usersService.getUsers());  //En caso de errores, recarga la lista de usuarios
 
-        marksService.addMark(mark); //anadimos la mark pasada por parametro (ModelAttribute)
-        //return "Ok"; //Asi, con el Model, intenta pasacar un fichero Ok, no un string y ya
+            return "mark/add";
+        }
+        marksService.addMark(mark);
         return "redirect:/mark/list";
     }
-        //add normal con GET
+
+
     @RequestMapping(value = "/mark/add")
     public String getMark(Model model){
         model.addAttribute("usersList", usersService.getUsers());
+
+        model.addAttribute("mark", new Mark()); //resuelve los errores del addMarkValidator, pues identifica el objeto Mark en los
+
         return "mark/add";
     }
 
