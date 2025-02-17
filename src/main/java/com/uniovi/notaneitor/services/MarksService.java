@@ -39,15 +39,7 @@ public class MarksService {
     }
 
     public Mark getMark(Long id) {
-        //return marksRepository.findById(id).get();
-        //Ahora tambien almacena info de la nota en la sesion
-        Set<Mark> consultedList = (Set<Mark>) httpSession.getAttribute("consultedList");
-        if (consultedList == null) {
-            consultedList = new HashSet<>();
-        }
         Mark mark = marksRepository.findById(id).isPresent() ? marksRepository.findById(id).get() : new Mark();
-        consultedList.add(mark);
-        httpSession.setAttribute("consultedList", consultedList);
         return mark;
     }
 

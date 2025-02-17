@@ -39,11 +39,6 @@ public class MarksController {
 
     @RequestMapping("/mark/list")
     public String getList(Model model) { //clase Model, que sirver para pasar datos a la vista
-
-        Set<Mark> consultedList = (Set<Mark>) (httpSession.getAttribute("consultedList") != null ?
-                httpSession.getAttribute("consultedList") : new HashSet<>());
-        model.addAttribute("consultedList", consultedList);
-
         model.addAttribute("markList", marksService.getMarks()); //asigna la lista de marcas al modelo como atributo
         return "mark/list"; //devuelve la vista mark/list.html
     }
