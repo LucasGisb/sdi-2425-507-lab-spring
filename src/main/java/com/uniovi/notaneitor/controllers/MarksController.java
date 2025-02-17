@@ -8,6 +8,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+
+import javax.servlet.http.HttpSession;
+import java.util.*;
+
+
 //@RestController  Para que pueda Responder con VIstas, cambiar a @Controller
 @Controller
 public class MarksController {
@@ -19,15 +24,26 @@ public class MarksController {
     private final MarksService marksService;
     private final UsersService usersService;
 
-    public MarksController(MarksService marksService, UsersService usersService) {
+    private final HttpSession httpSession;
+
+
+    public MarksController(MarksService marksService, UsersService usersService,
+                           HttpSession httpSession) {
         this.marksService = marksService;
         this.usersService = usersService;
+
+        this.httpSession = httpSession;
     }
 
     //Metodos para cada URL a la que responde el controlador:
 
     @RequestMapping("/mark/list")
     public String getList(Model model) { //clase Model, que sirver para pasar datos a la vista
+
+        Set<Mark> consultedList = (Set<Mark>) (httpSession.getAttribute("consultedList") != null ?
+                httpSession.getAttribute("consultedList") : new HashSet<>());
+        model.addAttribute("consultedList", consultedList);
+
         model.addAttribute("markList", marksService.getMarks()); //asigna la lista de marcas al modelo como atributo
         return "mark/list"; //devuelve la vista mark/list.html
     }
@@ -82,7 +98,7 @@ public class MarksController {
         // modificar solo score y description
         originalMark.setScore(mark.getScore());
         originalMark.setDescription(mark.getDescription());
-        marksService.addMark(originalMark);
+        marksService.addMark(originalMark); //EDIT USER: AQUI SAVE SEGUN PELAYO.
 
         return "redirect:/mark/details/"+id;  //tras editar y guardar, redirige a la vista de detalles de la Mark
     }

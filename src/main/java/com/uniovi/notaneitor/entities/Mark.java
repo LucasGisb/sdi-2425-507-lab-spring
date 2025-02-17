@@ -2,6 +2,7 @@ package com.uniovi.notaneitor.entities;
 
 //import jakarta.persistence.*; //cambio de version
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class Mark {
@@ -73,5 +74,13 @@ public class Mark {
         return "Mark {id=" + this.id + ", description=" + this.description + ", score=" + this.score + "}";
     }
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Mark mark = (Mark) o;
+        return Objects.equals(id, mark.id);
+    }
 
 }
