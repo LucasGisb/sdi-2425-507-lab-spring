@@ -5,6 +5,8 @@ import com.uniovi.notaneitor.repositories.MarksRepository;
 //import jakarta.annotation.PostConstruct; //cambio de version
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
@@ -58,6 +60,17 @@ public class MarksService {
     public void deleteMark(Long id) {
         //marksList.removeIf(mark -> mark.getId().equals(id));
         marksRepository.deleteById(id);
+    }
+
+    public void setMarkResend(boolean revised, Long id) {
+        //Antes de reenviar, se comprueba que el usuario NO este modificando una nota de otro usuario distinto
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String dni = auth.getName();
+        Mark mark = marksRepository.findById(id).get();
+        if(mark.getUser().getDni().equals(dni) ) {
+            marksRepository.updateResend(revised, id);
+        }
+
     }
 }
 

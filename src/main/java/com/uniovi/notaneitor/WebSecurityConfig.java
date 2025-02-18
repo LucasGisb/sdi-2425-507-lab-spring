@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 
 @Configuration
 @EnableWebSecurity
@@ -26,6 +27,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/css/**", "/images/**", "/script/**", "/", "/signup", "/login/**").permitAll()
+                //Solo los profesores poden modificar las notas. Verlas pueden todos los roles (IMP el ORDEN de declaracion)
+                .antMatchers("/mark/add").hasAuthority("ROLE_PROFESSOR")
+                .antMatchers("/mark/edit/*").hasAuthority("ROLE_PROFESSOR")
+                .antMatchers("/mark/delete/*").hasAuthority("ROLE_PROFESSOR")
+                .antMatchers("/mark/**").hasAnyAuthority("ROLE_STUDENT", "ROLE_PROFESSOR", "ROLE_ADMIN")
+                .antMatchers("/user/**").hasAnyRole("ADMIN") //Solo ADMIN tiene acceso a la gestion de usuarios
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -36,4 +43,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout()
                 .permitAll();
     }
+
+    //Gracias a este Bean, se implementa SpringSecurityDialect (que permite usar 'sec' (permit/rol) en las vistas)
+    @Bean
+    public SpringSecurityDialect securityDialect() {
+        return new SpringSecurityDialect();
+    }
+
+
 }

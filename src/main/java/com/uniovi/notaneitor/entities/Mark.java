@@ -13,6 +13,8 @@ public class Mark {
     private String description;
     private Double score;
 
+    private Boolean resend = false;  //atributo para hacer el reenvio de sus notas (transaccion)
+
     //declaro su relacion (Muchos a Uno) con la entidad User
     @ManyToOne
     @JoinColumn(name = "user_id") //JoinColumn (COMPLEMENTARIO a mappedBy) para indicar la columna de la tabla que hace referencia a la otra tabla
@@ -67,6 +69,13 @@ public class Mark {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Boolean getResend() {
+        return resend;
+    }
+    public void setResend(Boolean resend) {
+        this.resend = resend;
     }
 
     @Override
