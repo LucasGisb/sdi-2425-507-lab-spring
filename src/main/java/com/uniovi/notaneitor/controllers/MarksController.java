@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 
 import javax.servlet.http.HttpSession;
+import java.security.Principal;
 import java.util.*;
+import com.uniovi.notaneitor.entities.User;
 
 
 //@RestController  Para que pueda Responder con VIstas, cambiar a @Controller
@@ -38,14 +40,20 @@ public class MarksController {
     //Metodos para cada URL a la que responde el controlador:
 
     @RequestMapping("/mark/list")
-    public String getList(Model model) { //clase Model, que sirver para pasar datos a la vista
-        model.addAttribute("markList", marksService.getMarks()); //asigna la lista de marcas al modelo como atributo
+    public String getList(Model model, Principal principal) { //clase Model, que sirver para pasar datos a la vista
+        //model.addAttribute("markList", marksService.getMarks()); //asigna la lista de marcas al modelo como atributo
+        String dni = principal.getName(); // DNI es el name de la autenticación
+        User user = usersService.getUserByDni(dni);
+        model.addAttribute("markList", marksService.getMarksForUser(user) );
         return "mark/list"; //devuelve la vista mark/list.html
     }
 
     @RequestMapping("/mark/list/update")
-    public String updateList(Model model){
-        model.addAttribute("markList", marksService.getMarks() );
+    public String updateList(Model model, Principal principal){
+        //model.addAttribute("markList", marksService.getMarks() );
+        String dni = principal.getName(); // DNI es el name de la autenticación
+        User user = usersService.getUserByDni(dni);
+        model.addAttribute("markList", marksService.getMarksForUser(user));
         return "mark/list :: marksTable";  //EN LUGAR DE RETORNAR TODA LA VISTA, SOLO DEVUELVE EL FRAGMENTO marksTable (declarado en list.html)
     }
 
@@ -58,7 +66,7 @@ public class MarksController {
         //return "Ok"; //Asi, con el Model, intenta pasacar un fichero Ok, no un string y ya
         return "redirect:/mark/list";
     }
-        //add normal con GET
+    //add normal con GET
     @RequestMapping(value = "/mark/add")
     public String getMark(Model model){
         model.addAttribute("usersList", usersService.getUsers());
