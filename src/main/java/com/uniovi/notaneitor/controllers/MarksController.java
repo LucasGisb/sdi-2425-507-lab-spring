@@ -40,11 +40,19 @@ public class MarksController {
     //Metodos para cada URL a la que responde el controlador:
 
     @RequestMapping("/mark/list")
-    public String getList(Model model, Principal principal) { //clase Model, que sirver para pasar datos a la vista
+    public String getList(Model model, Principal principal,
+                          @RequestParam(value="", required=false) String searchText) { //clase Model, que sirver para pasar datos a la vista
         //model.addAttribute("markList", marksService.getMarks()); //asigna la lista de marcas al modelo como atributo
         String dni = principal.getName(); // DNI es el name de la autenticación
         User user = usersService.getUserByDni(dni);
-        model.addAttribute("markList", marksService.getMarksForUser(user) );
+
+        if(searchText != null && !searchText.isEmpty()){
+            model.addAttribute("markList", marksService.searchMarksByDescriptionAndNameForUser(searchText, user));
+        }else{
+            model.addAttribute("markList", marksService.getMarksForUser(user));
+        }
+
+        //model.addAttribute("markList", marksService.getMarksForUser(user) );
         return "mark/list"; //devuelve la vista mark/list.html
     }
 

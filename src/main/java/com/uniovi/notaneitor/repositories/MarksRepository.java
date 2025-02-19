@@ -17,4 +17,9 @@ public interface MarksRepository extends CrudRepository<Mark, Long> {
 
     @Query("SELECT r FROM Mark r WHERE r.user = ?1 ORDER BY r.id ASC")  //para que JPA no altere el orden al modificar las notas desde la vista
     List<Mark> findAllByUser(User user); //para mostrar todas las notas de un user
+
+    @Query("Select  r FROM Mark r WHERE (LOWER(r.description) LIKE LOWER(?1) OR LOWER(r.user.name) LIKE LOWER(?1))")
+    List<Mark> searchByDescriptionAndName(String searchText);
+    @Query("Select  r FROM Mark r WHERE (LOWER(r.description) LIKE LOWER(?1) OR LOWER(r.user.name) LIKE LOWER(?1)) AND r.user=?2")
+    List<Mark> searchByDescriptionNameAndUser(String searchText, User user);
 }
