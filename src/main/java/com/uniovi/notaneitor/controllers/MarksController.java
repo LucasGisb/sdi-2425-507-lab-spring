@@ -6,13 +6,17 @@ import com.uniovi.notaneitor.services.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import com.uniovi.notaneitor.validators.AddMarkValidator;
 
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
 import java.util.*;
 import com.uniovi.notaneitor.entities.User;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 
 
 //@RestController  Para que pueda Responder con VIstas, cambiar a @Controller
@@ -26,13 +30,17 @@ public class MarksController {
     private final MarksService marksService;
     private final UsersService usersService;
 
+    private final AddMarkValidator addMarkValidator;
+
     private final HttpSession httpSession;
 
 
     public MarksController(MarksService marksService, UsersService usersService,
-                           HttpSession httpSession) {
+                           AddMarkValidator addMarkValidator, HttpSession httpSession) {
         this.marksService = marksService;
         this.usersService = usersService;
+
+        this.addMarkValidator = addMarkValidator;
 
         this.httpSession = httpSession;
     }
@@ -40,44 +48,60 @@ public class MarksController {
     //Metodos para cada URL a la que responde el controlador:
 
     @RequestMapping("/mark/list")
-    public String getList(Model model, Principal principal,
+    public String getList(Model model, Pageable pageable, Principal principal,
                           @RequestParam(value="", required=false) String searchText) { //clase Model, que sirver para pasar datos a la vista
         //model.addAttribute("markList", marksService.getMarks()); //asigna la lista de marcas al modelo como atributo
         String dni = principal.getName(); // DNI es el name de la autenticación
         User user = usersService.getUserByDni(dni);
-
+        Page<Mark> marks;
         if(searchText != null && !searchText.isEmpty()){
-            model.addAttribute("markList", marksService.searchMarksByDescriptionAndNameForUser(searchText, user));
+            //model.addAttribute("markList", marksService.searchMarksByDescriptionAndNameForUser(searchText, user));
+            marks = marksService.searchMarksByDescriptionAndNameForUser(pageable, searchText, user);
         }else{
-            model.addAttribute("markList", marksService.getMarksForUser(user));
+            //model.addAttribute("markList", marksService.getMarksForUser(user));
+            marks = marksService.getMarksForUser(pageable, user);
         }
 
         //model.addAttribute("markList", marksService.getMarksForUser(user) );
+
+        model.addAttribute("markList", marks.getContent());
+        model.addAttribute("page", marks); //anadir las page a la vista
+
         return "mark/list"; //devuelve la vista mark/list.html
     }
 
     @RequestMapping("/mark/list/update")
-    public String updateList(Model model, Principal principal){
+    public String updateList(Model model, Pageable pageable, Principal principal){
         //model.addAttribute("markList", marksService.getMarks() );
         String dni = principal.getName(); // DNI es el name de la autenticación
         User user = usersService.getUserByDni(dni);
-        model.addAttribute("markList", marksService.getMarksForUser(user));
+
+        Page<Mark> marks = marksService.getMarksForUser(pageable, user);
+
+        //model.addAttribute("markList", marksService.getMarksForUser(user));
+        model.addAttribute("markList", marks.getContent());
         return "mark/list :: marksTable";  //EN LUGAR DE RETORNAR TODA LA VISTA, SOLO DEVUELVE EL FRAGMENTO marksTable (declarado en list.html)
     }
 
 
 
     @RequestMapping(value = "/mark/add", method = RequestMethod.POST) //ESTA EN CONCRETO especificamos que use POST
-    public String setMark(@ModelAttribute Mark mark) { //hacemos uso de la clase Mark de Entities
-
-        marksService.addMark(mark); //anadimos la mark pasada por parametro (ModelAttribute)
-        //return "Ok"; //Asi, con el Model, intenta pasacar un fichero Ok, no un string y ya
+    public String setMark(@ModelAttribute Mark mark, BindingResult result, Model model) { //MODEL PARA QUE, AL HABER ERRORES, PUEDA RECARGAR LA LISTA DE USUARIOS
+        addMarkValidator.validate(mark, result);
+        if (result.hasErrors()) {
+            model.addAttribute("usersList", usersService.getUsers());  //En caso de errores, recarga la lista de usuarios
+            return "mark/add";
+        }
+        marksService.addMark(mark);
         return "redirect:/mark/list";
     }
     //add normal con GET
     @RequestMapping(value = "/mark/add")
     public String getMark(Model model){
         model.addAttribute("usersList", usersService.getUsers());
+
+        model.addAttribute("mark", new Mark()); //resuelve los errores del addMarkValidator, pues identifica el objeto Mark en los
+
         return "mark/add";
     }
 
