@@ -1,5 +1,6 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
   <title>Notaneitor</title>
   <meta charset="utf-8"/>
@@ -40,8 +41,9 @@
         <td th:text="${teacher.name}">Paco</td>
         <td th:text="${teacher.surname}">Alonso</td>
         <td th:text="${teacher.category}">Categoria</td>
-        <td><a th:href="${'/teacher/details/' + teacher.dni}">detalles</a></td>
-        <td><a th:href="${'/teacher/delete/' + teacher.id}">eliminar</a></td>
+        <td><a sec:authorize="hasAnyRole('ROLE_PROFESSOR', 'ROLE_ADMIN')" th:href="${'/teacher/details/' + teacher.dni}">detalles</a></td>
+        <td><a sec:authorize="hasRole('ROLE_ADMIN')" th:href="${'/teacher/delete/' + teacher.id}">editar</a></td>
+        <td><a sec:authorize="hasRole('ROLE_ADMIN')" th:href="${'/teacher/delete/' + teacher.id}">eliminar</a></td>
       </tr>
       </tbody>
     </table>
