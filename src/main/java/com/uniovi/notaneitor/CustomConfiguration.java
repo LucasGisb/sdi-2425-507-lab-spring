@@ -1,6 +1,8 @@
 package com.uniovi.notaneitor;
 import java.util.List;
 import java.util.Locale;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.LocaleResolver;
@@ -15,6 +17,12 @@ import org.springframework.data.domain.PageRequest;
 
 @Configuration
 public class CustomConfiguration implements WebMvcConfigurer {
+
+    @Value("${spring.data.web.pageable.page-parameter}")
+    private int page;
+    @Value("${spring.data.web.pageable.size-parameter}")
+    private int size;
+    //Obtengo el valor declarado en aplication.properties con el Value y su enlace asi
 
     @Bean
     public LocaleResolver localeResolver() {
@@ -40,8 +48,11 @@ public class CustomConfiguration implements WebMvcConfigurer {
     //Para convertir GET page y size a objetos Page
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-        int page = 0;
-        int size = 5; //5  //2
+
+        //Ahora son atributos
+        //int page = 0;
+        //int size = 5; //5  //2
+
         PageableHandlerMethodArgumentResolver resolver = new PageableHandlerMethodArgumentResolver();
         resolver.setFallbackPageable(PageRequest.of(page, size));
         argumentResolvers.add(resolver);

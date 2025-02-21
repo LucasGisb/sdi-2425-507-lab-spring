@@ -33,6 +33,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/mark/delete/*").hasAuthority("ROLE_PROFESSOR")
                 .antMatchers("/mark/**").hasAnyAuthority("ROLE_STUDENT", "ROLE_PROFESSOR", "ROLE_ADMIN")
                 .antMatchers("/user/**").hasAnyRole("ADMIN") //Solo ADMIN tiene acceso a la gestion de usuarios
+                .antMatchers("/teacher/add").hasAnyAuthority("ROLE_ADMIN")
+                .antMatchers("/teacher/edit/*").hasAnyAuthority("ROLE_ADMIN")
+                .antMatchers("/teacher/delete/*").hasAnyAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
