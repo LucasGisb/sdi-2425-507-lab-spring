@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import com.uniovi.notaneitor.entities.*;
 import com.uniovi.notaneitor.services.UsersService;
 import com.uniovi.notaneitor.validators.SignUpFormValidator;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import com.uniovi.notaneitor.services.MarksService;
 
 @Controller
 public class UsersController {
@@ -24,7 +27,9 @@ public class UsersController {
 
     private final RolesService rolesService;
 
-    public UsersController(UsersService usersService, SecurityService securityService,
+    private final MarksService marksService;
+
+    public UsersController(UsersService usersService, MarksService marksService, SecurityService securityService,
                            SignUpFormValidator signUpFormValidator, RolesService rolesService) {
         this.usersService = usersService;
 
@@ -33,6 +38,8 @@ public class UsersController {
         this.signUpFormValidator = signUpFormValidator;
 
         this.rolesService= rolesService;
+
+        this.marksService = marksService;
     }
 
     @RequestMapping("/user/list")
@@ -119,11 +126,18 @@ public class UsersController {
     }
 
     @RequestMapping(value = {"/home"}, method = RequestMethod.GET)
-    public String home(Model model) {
+    public String home(Model model, Pageable pageable) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();  //Obtiene la Autentificacion del usuario actual
         String dni = auth.getName(); //obtenemos IDENTIFICADOR (dni) del usuario autentificado
         User activeUser = usersService.getUserByDni(dni); //sacamos el Usuario en base a lo anterior
         model.addAttribute("markList", activeUser.getMarks()); //Sacamos la lista de notas del usuario registrado
+
+        //model.addAttribute("marksList", marksService.getMarks());
+        //Asi no, pues ahora es Paginado  (tambien ponerlo como parametro del metodo)
+        Page<Mark> marks = marksService.getMarksForUser(pageable, activeUser);
+        model.addAttribute("markList", marks.getContent()); //IMP para que maneje bien las notas (hace que los botones de reenviar estan bien)
+        model.addAttribute("page", marks);
+
         return "home";
     }
 

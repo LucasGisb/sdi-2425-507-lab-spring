@@ -80,7 +80,9 @@ public class MarksController {
 
         //model.addAttribute("markList", marksService.getMarksForUser(user));
         model.addAttribute("markList", marks.getContent());
-        return "mark/list :: marksTable";  //EN LUGAR DE RETORNAR TODA LA VISTA, SOLO DEVUELVE EL FRAGMENTO marksTable (declarado en list.html)
+        //return "mark/list :: marksTable";  //EN LUGAR DE RETORNAR TODA LA VISTA, SOLO DEVUELVE EL FRAGMENTO marksTable (declarado en list.html)
+        //seria lo mismo, pero asi mas coherente:
+        return "fragments/marksTable";
     }
 
 
