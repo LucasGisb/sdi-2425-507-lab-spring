@@ -11,10 +11,17 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.beans.factory.annotation.Value;
 
 
 @Configuration
 public class CustomConfiguration implements WebMvcConfigurer {
+
+    @Value("${spring.data.web.pageable.page-parameter}")
+    private int page;
+    @Value("${spring.data.web.pageable.size-parameter}")
+    private int size;
+    //Obtengo el valor declarado en aplication.properties con el Value y su enlace asi
 
     @Bean
     public LocaleResolver localeResolver() {
@@ -40,8 +47,9 @@ public class CustomConfiguration implements WebMvcConfigurer {
     //Para convertir GET page y size a objetos Page
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-        int page = 0;
-        int size = 5; //5  //2
+        //Ahora son atributos
+        //int page = 0;
+        //int size = 5; //5  //2
         PageableHandlerMethodArgumentResolver resolver = new PageableHandlerMethodArgumentResolver();
         resolver.setFallbackPageable(PageRequest.of(page, size));
         argumentResolvers.add(resolver);

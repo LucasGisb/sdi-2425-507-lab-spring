@@ -1,6 +1,7 @@
 package com.uniovi.notaneitor.pageobjects;
 import com.uniovi.notaneitor.util.SeleniumUtils;
 import org.junit.jupiter.api.Assertions;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import java.util.List;
@@ -49,4 +50,9 @@ public class PO_NavView  extends PO_View{
         Selectedlanguage.get(0).click();
     }
 
+
+    static public void clickLogout(WebDriver driver){
+        By boton = By.xpath("/html/body/nav/div/div[2]/ul/li[2]/a/span");
+        driver.findElement(boton).click();
+    }
 }
