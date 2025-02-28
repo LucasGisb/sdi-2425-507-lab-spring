@@ -33,5 +33,26 @@ public class PO_PrivateView extends PO_NavView {
         PO_NavView.clickOption(driver, "logout", "class", "btn btn-primary");
     }
 
+    static public void fillFormAddProfessor(WebDriver driver, String dni, String name, String lastName, String category) {
+        WebElement dniElement = driver.findElement(By.name("dni"));
+        dniElement.click();
+        dniElement.clear();
+        dniElement.sendKeys(dni);
+        WebElement nameElement = driver.findElement(By.name("name"));
+        nameElement.click();
+        nameElement.clear();
+        nameElement.sendKeys(name);
+        WebElement lastNameElement = driver.findElement(By.name("surname"));
+        lastNameElement.click();
+        lastNameElement.clear();
+        lastNameElement.sendKeys(lastName);
 
+        WebElement categoryElement = driver.findElement(By.name("category"));
+        categoryElement.click();
+        categoryElement.clear();
+        categoryElement.sendKeys(category);
+
+        By boton = By.className("btn");
+        driver.findElement(boton).click();
+    }
 }

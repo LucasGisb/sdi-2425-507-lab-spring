@@ -440,9 +440,73 @@ class Sdi2425507SpringApplicationTests {
         PO_PrivateView.logoutMethod(driver, PO_Properties.getSPANISH());
     }
 
-
     //Refactorizacion de PR12-15
     //Login
     //Logout
     //Click en distintos elementos
+
+    //Anadir un profesor VALIDO
+    @Test
+    @Order(21)
+    public void PR16() {
+        //Vamos al formulario de logueo.
+        PO_PrivateView.loginMethod(driver, "99999988F", "123456");
+        //Comprobamos que entramos en la pagina privada de Admin
+        PO_View.checkElementBy(driver, "text", "99999988F");
+        //Pinchamos en la opción de menú de Profesores
+                                                                                        //3
+        PO_View.checkAndClickElement(driver, "free", "//*[@id='myNavbar']/ul[1]/li[4]", 0);
+        //Pinchamos en la opción de añadir profesor
+        PO_View.checkAndClickElement(driver, "free", "//a[contains(@href, 'professor/add')]", 0);
+        //Y, ya dentro, rellenamos el formulario
+        PO_PrivateView.fillFormAddProfessor(driver, "99999999A", "Josefo", "Perez", "77777");
+        //Comprobamos que aparece el profesor en la lista
+        List<WebElement> elements = PO_View.checkElementBy(driver, "text", "99999999A");
+        Assertions.assertEquals("99999999A", elements.get(0).getText());
+    }
+
+    //Ahora invalido
+    @Test
+    @Order(22)
+    public void PR17() {
+        //Vamos al formulario de logueo.
+        PO_PrivateView.loginMethod(driver, "99999988F", "123456");
+        //Comprobamos que entramos en la pagina privada de Admin
+        PO_View.checkElementBy(driver, "text", "99999988F");
+        //Pinchamos en la opción de menú de Profesores
+        //3
+        PO_View.checkAndClickElement(driver, "free", "//*[@id='myNavbar']/ul[1]/li[4]", 0);
+        //Pinchamos en la opción de añadir profesor
+        PO_View.checkAndClickElement(driver, "free", "//a[contains(@href, 'professor/add')]", 0);
+        //Y, ya dentro, rellenamos el formulario
+        PO_PrivateView.fillFormAddProfessor(driver, "99999988FFF", "Josefo", "Perez", "77777");
+
+
+        List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.professor.dni.format",
+                PO_Properties.getSPANISH() );
+        //Comprobamos el error de DNI repetido.
+        String checkText = PO_HomeView.getP().getString("Error.professor.dni.format",
+                PO_Properties.getSPANISH());
+        Assertions.assertEquals(checkText , result.get(0).getText());
+    }
+
+    //Un usuario no valido intenta realizar una peticion de anadir profesor
+    @Test
+    @Order(23)
+    public void PR18() {
+        PO_PrivateView.loginMethod(driver, "99999990A", "123456");
+
+        String checkText = "Notas del usuario";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+
+        driver.navigate().to("http://localhost:8090/professor/add");
+
+        //Comprobar que salta la excepcion 403
+        checkText = "There was an unexpected error (type=Forbidden, status=403).";
+        result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.get(0).getText());
+    }
+
+
+
 }
